@@ -83,6 +83,7 @@ def get_load(task_list, task_num):
             DataFrame(load_record).to_excel('../../data/scheduling_DNN/load.xls')
 
 
+# 获取真实运行时间矩阵，以便后续求deadline
 def get_time_matrix(task_list, task_num):
     # 构造结果表
     book = Workbook(encoding='utf-8')
@@ -376,6 +377,11 @@ equips = [[1, 1], [2, 1], [3, 1], [4, 1], [2, 1], [4, 1], [4, 1],
           [1, 4], [2, 4], [3, 4], [4, 4], [2, 4], [4, 4], [4, 4],
           [1, 8], [2, 8], [3, 8], [4, 8], [2, 8], [4, 8], [4, 8]]
 
+
+# 调度的输入是
+# task_num
+# task_list
+# data/predict中的预测时间
 if __name__ == '__main__':
     # 任务个数
     task_num = 30
@@ -385,13 +391,13 @@ if __name__ == '__main__':
     ##################################################
     proportion = int(30 * 0.6)
     # 根据任务列表求负载
-    # get_load(task_list, task_num)
-    # get_time_matrix(task_list, task_num)
+    get_load(task_list, task_num)
+    get_time_matrix(task_list, task_num)
     # 从time_matrix中获取deadline,按照比例
-    # get_deadline(task_list, task_num, proportion)
-    # get_minload(task_list, task_num)
-    # get_weight(task_list, task_num)
-    # get_weight_sorted(task_list, task_num)
+    get_deadline(task_list, task_num, proportion)
+    get_minload(task_list, task_num)
+    get_weight(task_list, task_num)
+    get_weight_sorted(task_list, task_num)
     ##################################################
     # 虚拟机个数
     vm = 10

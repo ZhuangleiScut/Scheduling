@@ -85,6 +85,7 @@ def get_load(task_list, task_num):
             DataFrame(load_record).to_excel('../../data/scheduling_matrix/load.xls')
 
 
+# 获取真实运行时间矩阵，以便后续求deadline
 def get_time_matrix(task_list, task_num):
     # 构造结果表
     book = Workbook(encoding='utf-8')
