@@ -1,3 +1,4 @@
+import pandas as pd
 import xlwt
 from xlwt import Workbook
 
@@ -13,3 +14,5 @@ sheet1.write(1,1,"我是第2行第二列")
 
 # 保存Excel book.save('path/文件名称.xls')
 book.save('simple.xlsx')
+data = pd.read_excel('simple.xlsx')
+print(data[1][1])

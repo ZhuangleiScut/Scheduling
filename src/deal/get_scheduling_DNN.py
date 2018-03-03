@@ -67,7 +67,7 @@ def get_load(task_list, task_num):
 
     for i in range(equip_num):
         # 打开Excel文件
-        data = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx', sheetname=0)
+        data = pd.read_excel('../../data/scheduling_DNN/predict/result' + str(i + 1) + '.xlsx', sheetname=0)
         load_record = pd.read_excel('../../data/scheduling_DNN/load.xls')
         # data_size = len(data['frame_process_time'])
         # print(data_size)
@@ -332,7 +332,7 @@ def get_scheduling(vm):
             # task 和index,这里用的是真实值
             table = pd.read_excel('../../data/raw/result' + str(index + 1) + '.xlsx', sheetname=0)
             time = table['frame_process_time'][task]
-            times.append(time / (deadline))
+            times.append(time / (deadline*2))
             print(time)
 
             # 调度成功

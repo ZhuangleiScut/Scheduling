@@ -42,7 +42,7 @@ print('accuracy:', score)
 pre = model.predict(X_test, verbose=1)
 # print(pre)
 # print(y_test)
-erro = [abs(x-y) for x,y in zip(y_test, pre)]
+erro = [abs(x-y) for x, y in zip(y_test, pre)]
 print(pre)
 # print(y_test, pre, erro)
 print('max:',max(erro))

@@ -332,7 +332,7 @@ def get_scheduling(vm):
             # task 和index,这里用的是真实值
             table = pd.read_excel('../../data/raw/result' + str(index + 1) + '.xlsx', sheetname=0)
             time = table['frame_process_time'][task]
-            times.append(time / (deadline))
+            times.append(time / (deadline*2))
             print(time)
 
             # 调度成功

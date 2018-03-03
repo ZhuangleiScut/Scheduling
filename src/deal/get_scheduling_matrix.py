@@ -293,14 +293,14 @@ def get_scheduling(vm):
     # 每个任务的调度
     for k in range(task_num):
         result = []
-        weight = data['sort'][k]
+        # weight = data['sort'][k]
         task = data['task'][k]
         deadline = data['deadline'][k]
         print('任务：', k, task, deadline)
 
         # 根据task从初始数据中查TET是否符合deadline要求
         for t in range(28):
-            time_record = pd.read_excel('../../data/scheduling_matrix/time_matrix.xls')
+            time_record = pd.read_excel('../../data/scheduling_matrix/predict_time_matrix.xls')
             tet = time_record['equip'+str(t+1)][k]
             print('tet', tet)
             if tet <= deadline:
