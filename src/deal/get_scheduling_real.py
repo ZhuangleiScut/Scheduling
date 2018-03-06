@@ -288,6 +288,8 @@ def get_scheduling(vm):
     success = 0
     fail = 0
     times = []
+    # 记录功耗信息
+    energys = []
     # 每个任务的调度
     for k in range(task_num):
         result = []
@@ -313,7 +315,10 @@ def get_scheduling(vm):
             # given资源记录
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
-            times.append(1)
+            times.append(deadline)
+            print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm没有符合要求', times)
+            # 将更新写到新的Excel中
+            DataFrame(data).to_excel('../../data/scheduling_real/schedule/' + str(vm) + '.xlsx')
             continue
 
         # 根据result求负载最小的配置对应的表（要加一）
@@ -326,13 +331,14 @@ def get_scheduling(vm):
         data['mem_need'][k] = equips[index][1]
         # 如果资源足够，可以进行调度。剩余资源减去调度资源
         if (resourse[0] >= equips[index][0]) and (resourse[1] >= equips[index][1]):
+
             resourse[0] = resourse[0] - equips[index][0]
             resourse[1] = resourse[1] - equips[index][1]
 
             # task 和index,这里用的是真实值
             table = pd.read_excel('../../data/raw/result' + str(index + 1) + '.xlsx', sheetname=0)
             time = table['frame_process_time'][task]
-            times.append(time / (deadline*2))
+            times.append(time)
             print(time)
 
             # 调度成功
@@ -340,15 +346,23 @@ def get_scheduling(vm):
             # given资源记录
             data['cpu_given'][k] = equips[index][0]
             data['mem_given'][k] = equips[index][1]
+            # 功率为硬件*时间
+            energy = (equips[index][0] / 4) * time
+            energys.append(energy)
             success += 1
         else:
             fail += 1
-            times.append(1)
+            times.append(deadline)
+            print('klkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk')
+            print(deadline)
+            print(times)
             # 调度失败
             data['offload'][k] = 0
             # given资源记录
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
+            # 将更新写到新的Excel中
+            DataFrame(data).to_excel('../../data/scheduling_real/schedule/' + str(vm) + '.xlsx')
             continue
 
         print('')
@@ -359,10 +373,17 @@ def get_scheduling(vm):
     if len(times) > 0:
         times_avg = sum(times) / len(times)
 
+    energys_avg = 0
+    if len(energys) > 0:
+        energys_avg = sum(energys) / len(energys)
+
+
+    print('ttttttttttttttttttttttttttttttttttttttt',len(times))
+
     print('时间：', times)
     print('时间：', times_avg)
     print('success,fail', success, fail)
-    return success, times_avg
+    return success, times_avg, energys_avg
 
 
 # 配置个数
@@ -398,6 +419,7 @@ if __name__ == '__main__':
     vm = 10
     successes = []
     times = []
+    energys = []
     v = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     # 构造调度结果表
     # 构造结果表
@@ -406,6 +428,7 @@ if __name__ == '__main__':
     sheet1.write(0, 0, "id")
     sheet1.write(0, 1, "success")
     sheet1.write(0, 2, "time")
+    sheet1.write(0, 3, "energy")
     for i in range(15):
         sheet1.write(i + 1, 0, i)
     # 保存Excel book.save('path/文件名称.xls')
@@ -413,13 +436,16 @@ if __name__ == '__main__':
 
     data = pd.read_excel('../../data/scheduling_real/scheduling.xls')
     for vm in range(1, 11):
-        success, time = get_scheduling(vm)
+        success, time, energy = get_scheduling(vm)
         successes.append(success)
         times.append(time)
+        energys.append(energy)
         data['success'][vm - 1] = success
         data['time'][vm - 1] = time
+        data['energy'][vm - 1] = energy
     print('success', successes)
     print('time', times)
+    print('energy', energys)
     DataFrame(data).to_excel('../../data/scheduling_real/scheduling.xls')
     # success.append(get_scheduling(vm))
 
@@ -443,6 +469,13 @@ if __name__ == '__main__':
     plt.savefig('../../data/scheduling_real/time.png')
     plt.show()
 
+    # # summarize history for accuracy
+    plt.plot(v, energys)
+    # plt.plot(history.history['val_loss'])
+    plt.title('energys')
+    plt.ylabel('energys')
+    plt.xlabel('num_vm')
+    plt.legend(['energys'], loc='upper left')
+    plt.savefig('../../data/scheduling_real/energy.png')
+    plt.show()
 
-    # for i in range(10):
-    #     data['success'][i] =

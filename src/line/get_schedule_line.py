@@ -17,6 +17,11 @@ if __name__ == '__main__':
     success2 = data2['success'][0:10]
     success3 = data3['success'][0:10]
 
+    energy1 = data1['energy'][0:10]
+    energy2 = data2['energy'][0:10]
+    energy3 = data3['energy'][0:10]
+
+
     print(time1)
     print(time2)
     print(time3)
@@ -29,7 +34,7 @@ if __name__ == '__main__':
     plt.title('time')
     plt.ylabel('time_schedule')
     plt.xlabel('num_vm')
-    plt.legend(['time_real', 'time_predict', 'time_matrix'], loc='upper right')
+    plt.legend(['time_real', 'time_predict', 'time_matrix'], loc='upper left')
     plt.savefig('../../data/line/time_1.png')
     plt.show()
 
@@ -45,19 +50,11 @@ if __name__ == '__main__':
     plt.savefig('../../data/line/num_1.png')
     plt.show()
 
-
-    power1 = []
-    power2 = []
-    power3 = []
-    for g in range(10):
-        power1.append(1.75*time1[g])
-        power2.append(1.75*time2[g])
-        power3.append(1.75 * time3[g])
-
     # summarize history for accuracy
-    plt.plot(v, power1)
-    plt.plot(v, power2)
-    plt.plot(v, power3)
+    plt.plot(v, energy1)
+    plt.plot(v, energy2)
+    plt.plot(v, energy3)
+    # print('energy', energy1)
     # plt.plot(history.history['val_loss'])
     plt.title('Power consumption')
     plt.ylabel('Power consumption')

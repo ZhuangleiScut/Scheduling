@@ -106,4 +106,4 @@
 
 
 
-get_load需要用预测值
+两个地方用到了预测值：get_load需要用预测值，调度的时候选tet<deadline时

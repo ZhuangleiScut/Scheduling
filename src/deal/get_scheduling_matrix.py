@@ -76,9 +76,9 @@ def get_load(task_list, task_num):
             cpu = data['cpu_core'][task_list[img]]
             mem = data['mem_used'][task_list[img]]
             # 使用预测的矩阵中的时间值
-            tet = time_record['equip'+str(i+1)][img]
+            tet = time_record['equip' + str(i + 1)][img]
             # print(cpu,mem,tet)
-            load = ((0.5 * cpu / 4) + (0.5 * mem / 8349896704)) * tet
+            load = ((0.5 * cpu / 4) + (0.5 * mem / 8349896704)) * abs(tet)
             print('load', int(task_list[img]), load, cpu, mem, tet)
             load_record['task' + str(int(task_list[img]))][i] = load
             # 将更新写到新的Excel中
@@ -282,6 +282,13 @@ def get_min_load(result):
     return result[index]
 
 
+def get_task_position(task, task_num):
+    data = pd.read_excel('../../data/task_img_id.xls')
+    for i in range(task_num):
+        if data['image_id'][i] == task:
+            return i
+
+
 # 每一次调度
 def get_scheduling(vm):
     resourse = [vm * cpu, vm * mem]
@@ -290,32 +297,34 @@ def get_scheduling(vm):
     success = 0
     fail = 0
     times = []
+    energys = []
     # 每个任务的调度
     for k in range(task_num):
         result = []
         # weight = data['sort'][k]
         task = data['task'][k]
+        tet_pos = get_task_position(task, task_num)
         deadline = data['deadline'][k]
         print('任务：', k, task, deadline)
 
         # 根据task从初始数据中查TET是否符合deadline要求
         for t in range(28):
             time_record = pd.read_excel('../../data/scheduling_matrix/predict_time_matrix.xls')
-            tet = time_record['equip'+str(t+1)][k]
+            tet = time_record['equip' + str(t + 1)][tet_pos]
             print('tet', tet)
-            if tet <= deadline:
+            if abs(tet) <= deadline:
                 result.append(t)
                 print('t', t, tet)
         print('符合要求的配置的序号：', result)
 
         # 如果没有符合要求的配置
         if len(result) == 0:
-            # 调度成功
+            # 调度失败
             data['offload'][k] = 0
             # given资源记录
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
-            times.append(1)
+            times.append(deadline)
             continue
 
         # 根据result求负载最小的配置对应的表（要加一）
@@ -328,29 +337,50 @@ def get_scheduling(vm):
         data['mem_need'][k] = equips[index][1]
         # 如果资源足够，可以进行调度。剩余资源减去调度资源
         if (resourse[0] >= equips[index][0]) and (resourse[1] >= equips[index][1]):
+            # 分配资源
             resourse[0] = resourse[0] - equips[index][0]
             resourse[1] = resourse[1] - equips[index][1]
 
-            # task 和index,这里用的是真实值
+            # task 和index,这里用的是真实值  求任务在index序号下的运行时间，看是否符合deadline
             table = pd.read_excel('../../data/raw/result' + str(index + 1) + '.xlsx', sheetname=0)
             time = table['frame_process_time'][task]
-            times.append(time / (deadline*2))
-            print(time)
 
-            # 调度成功
-            data['offload'][k] = 1
-            # given资源记录
-            data['cpu_given'][k] = equips[index][0]
-            data['mem_given'][k] = equips[index][1]
-            success += 1
+            # 如果真实运行时间符合deadline要求，可以成功调度
+            if time <= deadline:
+                times.append(time)
+                print(time)
+                # 调度成功
+                data['offload'][k] = 1
+                # given资源记录
+                data['cpu_given'][k] = equips[index][0]
+                data['mem_given'][k] = equips[index][1]
+                # 功率为硬件*时间
+                energy = (equips[index][0] / 4) * time
+                energys.append(energy)
+                success += 1
+            # 调度但是不成功
+            else:
+                times.append(2 * deadline)
+                # 调度失败
+                data['offload'][k] = 2
+                # given资源记录
+                data['cpu_given'][k] = equips[index][0]
+                data['mem_given'][k] = equips[index][1]
+                # 功率为硬件*时间
+                energy = (equips[index][0] / 4) * 2 * deadline
+                energys.append(energy)
+            # 没有调度
         else:
             fail += 1
-            times.append(1)
-            # 调度失败
+            times.append(deadline)
+            # 没有调度
             data['offload'][k] = 0
             # given资源记录
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
+            # 将更新写到新的Excel中
+            DataFrame(data).to_excel('../../data/scheduling_matrix/schedule/' + str(vm) + '.xlsx')
+
             continue
 
         print('')
@@ -361,10 +391,14 @@ def get_scheduling(vm):
     if len(times) > 0:
         times_avg = sum(times) / len(times)
 
+    energys_avg = 0
+    if len(energys) > 0:
+        energys_avg = sum(energys) / len(energys)
+
     print('时间：', times)
     print('时间：', times_avg)
     print('success,fail', success, fail)
-    return success, times_avg
+    return success, times_avg, energys_avg
 
 
 # 配置个数
@@ -400,6 +434,7 @@ if __name__ == '__main__':
     vm = 10
     successes = []
     times = []
+    energys = []
     v = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     # 构造调度结果表
     # 构造结果表
@@ -408,6 +443,7 @@ if __name__ == '__main__':
     sheet1.write(0, 0, "id")
     sheet1.write(0, 1, "success")
     sheet1.write(0, 2, "time")
+    sheet1.write(0, 3, "energy")
     for i in range(15):
         sheet1.write(i + 1, 0, i)
     # 保存Excel book.save('path/文件名称.xls')
@@ -415,13 +451,16 @@ if __name__ == '__main__':
 
     data = pd.read_excel('../../data/scheduling_matrix/scheduling.xls')
     for vm in range(1, 11):
-        success, time = get_scheduling(vm)
+        success, time, energy = get_scheduling(vm)
         successes.append(success)
         times.append(time)
+        energys.append(energy)
         data['success'][vm - 1] = success
         data['time'][vm - 1] = time
+        data['energy'][vm - 1] = energy
     print('success', successes)
     print('time', times)
+    print('energy', energys)
     DataFrame(data).to_excel('../../data/scheduling_matrix/scheduling.xls')
     # success.append(get_scheduling(vm))
 
@@ -445,3 +484,12 @@ if __name__ == '__main__':
     plt.savefig('../../data/scheduling_matrix/time.png')
     plt.show()
 
+    # # summarize history for accuracy
+    plt.plot(v, energys)
+    # plt.plot(history.history['val_loss'])
+    plt.title('energys')
+    plt.ylabel('energys')
+    plt.xlabel('num_vm')
+    plt.legend(['energys'], loc='upper left')
+    plt.savefig('../../data/scheduling_DNN/energys.png')
+    plt.show()
