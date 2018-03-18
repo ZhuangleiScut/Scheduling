@@ -286,6 +286,7 @@ def get_scheduling(vm):
     # 打开文件
     data = pd.read_excel('../../data/scheduling_DNN/weight_sorted.xls')
     success = 0
+    scheduled = 0
     fail = 0
     times = []
     # 记录功耗信息
@@ -300,7 +301,7 @@ def get_scheduling(vm):
 
         # 根据task从初始数据中查TET是否符合deadline要求
         for t in range(28):
-            raw = pd.read_excel('../../data/scheduling_DNN/predict/0.9/result' + str(i + 1) + '.xlsx')
+            raw = pd.read_excel('../../data/scheduling_DNN/predict/0.9/result' + str(t + 1) + '.xlsx')
             tet = raw['predict_time'][int(task)]
             print('tet', tet)
             if tet <= deadline:
@@ -356,20 +357,23 @@ def get_scheduling(vm):
                 data['cpu_given'][k] = equips[index][0]
                 data['mem_given'][k] = equips[index][1]
                 # 功率为硬件*时间
-                energy = (equips[index][0]/4) * time
+                energy = (equips[index][0] / 4) * time
                 energys.append(energy)
                 success += 1
-            #调度但是不成功
+            # 调度但是不成功
             else:
-                times.append(2*deadline)
+                times.append(2 * deadline)
                 # 调度失败
                 data['offload'][k] = 2
                 # given资源记录
                 data['cpu_given'][k] = equips[index][0]
                 data['mem_given'][k] = equips[index][1]
                 # 功率为硬件*时间
-                energy = (equips[index][0] / 4) * 2*deadline
+                energy = (equips[index][0] / 4) * 2 * deadline
                 energys.append(energy)
+
+            # 统计调度总数
+            scheduled += 1
         # 没有调度
         else:
             fail += 1
@@ -398,7 +402,7 @@ def get_scheduling(vm):
     print('时间：', times)
     print('时间：', times_avg)
     print('success,fail', success, fail)
-    return success, times_avg, energys_avg
+    return success, times_avg, energys_avg, scheduled
 
 
 # 配置个数
@@ -412,7 +416,6 @@ equips = [[1, 1], [2, 1], [3, 1], [4, 1], [2, 1], [4, 1], [4, 1],
           [1, 2], [2, 2], [3, 2], [4, 2], [2, 2], [4, 2], [4, 2],
           [1, 4], [2, 4], [3, 4], [4, 4], [2, 4], [4, 4], [4, 4],
           [1, 8], [2, 8], [3, 8], [4, 8], [2, 8], [4, 8], [4, 8]]
-
 
 # 调度的输入是
 # task_num
@@ -438,6 +441,7 @@ if __name__ == '__main__':
     # 虚拟机个数
     vm = 10
     successes = []
+    schedule_pro = []
     times = []
     energys = []
     v = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -448,25 +452,29 @@ if __name__ == '__main__':
     sheet1.write(0, 0, "id")
     sheet1.write(0, 1, "success")
     sheet1.write(0, 2, "time")
-    sheet1.write(0, 3, "energy") # 功耗
+    sheet1.write(0, 3, "energy")  # 功耗
+    sheet1.write(0, 4, "schedule_pro")
     for i in range(15):
         sheet1.write(i + 1, 0, i)
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/scheduling_DNN/scheduling.xls')
+    book.save('../../data/scheduling_DNN/scheduling_DNN.xls')
 
-    data = pd.read_excel('../../data/scheduling_DNN/scheduling.xls')
+    data = pd.read_excel('../../data/scheduling_DNN/scheduling_DNN.xls')
     for vm in range(1, 11):
-        success, time, energy = get_scheduling(vm)
+        success, time, energy, scheduled= get_scheduling(vm)
         successes.append(success)
         times.append(time)
         energys.append(energy)
+        schedule_pro.append(float(success / scheduled))
         data['success'][vm - 1] = success
         data['time'][vm - 1] = time
         data['energy'][vm - 1] = energy
+        data['schedule_pro'][vm - 1] = float(success/scheduled)
     print('success', successes)
     print('time', times)
     print('energy', energys)
-    DataFrame(data).to_excel('../../data/scheduling_DNN/scheduling.xls')
+    print('schedule_pro', schedule_pro)
+    DataFrame(data).to_excel('../../data/scheduling_DNN/scheduling_DNN.xls')
     # success.append(get_scheduling(vm))
 
     # summarize history for accuracy
@@ -497,6 +505,15 @@ if __name__ == '__main__':
     plt.xlabel('num_vm')
     plt.legend(['energys'], loc='upper left')
     plt.savefig('../../data/scheduling_DNN/energys.png')
+    plt.show()
+
+    plt.plot(v, schedule_pro)
+    # plt.plot(history.history['val_loss'])
+    plt.title('schedule_pro')
+    plt.ylabel('schedule_pro')
+    plt.xlabel('num_vm')
+    plt.legend(['schedule_pro'], loc='upper left')
+    plt.savefig('../../data/scheduling_DNN/schedule_pro.png')
     plt.show()
 
     # for i in range(10):

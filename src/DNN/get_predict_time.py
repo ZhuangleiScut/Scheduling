@@ -30,7 +30,7 @@ for table in range(28):
     # Build a 2 layer fully connected DNN with 10 and 5 units respectively
 
     # 加载模型,旧版本是load_model()
-    model = load_model('../../data/DNN_train/model_0.9.h5')
+    model = load_model('../../data/DNN_train/model_0.8.h5')
 
     # 打印模型
     model.summary()
@@ -42,4 +42,4 @@ for table in range(28):
         df['predict_time'][t] = pre[t]
         df['error'][t] = pow(df['frame_process_time'][t] - pre[t], 2)  # 计算平方误差
         print(t, df['frame_process_time'][t], pre[t], df['error'][t])
-    DataFrame(df).to_excel('../../data/scheduling_DNN/predict/0.9/result' + str(table + 1) + '.xlsx')
+    DataFrame(df).to_excel('../../data/scheduling_DNN/predict/0.8/result' + str(table + 1) + '.xlsx')
