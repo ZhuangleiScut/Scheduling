@@ -15,14 +15,13 @@ if __name__ == '__main__':
     # 9个比例循环实现
     # schedule_real()
     for i in range(9):
-
-        schedule_matrix(i)
+        # schedule_matrix(i)
         schedule_DNN(i)
 
-    # schedule_real()
-    # # 一共有k组实验
-    # for num in range(10):
-    #     # 9个比例循环实现
-    #     for i in range(9):
-    #         schedule_DNN(i)
-    #         schedule_matrix(i)
+    schedule_real()
+    # 一共有k组实验
+    for num in range(10):
+        # 9个比例循环实现
+        for i in range(9):
+            schedule_DNN(num, i)
+            schedule_matrix(num, i)

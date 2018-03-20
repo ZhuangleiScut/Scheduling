@@ -41,6 +41,9 @@ def get_time_matrix(pro, task_list, task_num):
         print(i)
 
 
+
+
+
 if __name__ == '__main__':
     task_list = get_task_id(30)
     # 9种比例

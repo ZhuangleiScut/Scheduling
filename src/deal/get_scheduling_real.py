@@ -76,7 +76,7 @@ def get_load(task_list, task_num):
             mem = data['mem_used'][task_list[img]]
             tet = data['frame_process_time'][task_list[img]]
             # print(cpu,mem,tet)
-            load = ((0.5 * cpu / 4) + (0.5 * mem / 8349896704)) * tet
+            load = ((0.99 * cpu / 4) + (0.01 * mem / 8349896704)) * tet
             print('load', int(task_list[img]), load, cpu, mem, tet)
             load_record['task' + str(int(task_list[img]))][i] = load
             # 将更新写到新的Excel中
@@ -268,7 +268,7 @@ def get_min_load(result):
     for s in range(length):
         res = result[s]
         equip = equips[res]
-        load = 0.5 * equip[0] / 4 + 0.5 * equip[1] / 8
+        load = 0.99 * equip[0] / 4 + 0.01 * equip[1] / 8
         loads.append(load)
     print('符合要求的负载：', loads)
 
