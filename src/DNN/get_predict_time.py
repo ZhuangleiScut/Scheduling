@@ -4,6 +4,12 @@ from sklearn import preprocessing
 from keras.models import load_model
 from pandas import DataFrame
 
+
+"""
+通过加载get_model得到的模型
+对数据集进行预测
+并将得到的结果矩阵保存
+"""
 result_index = ['image_size', 'resolution1', 'resolution2', 'face_num', 'face_area', 'cpu_core', 'mem_total']
 for table in range(28):
     print('table' + str(table))

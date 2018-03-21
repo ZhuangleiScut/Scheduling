@@ -3,6 +3,9 @@ from sklearn import model_selection
 from sklearn import preprocessing
 from keras.models import load_model
 
+"""
+加载模型的案例
+"""
 
 # 读取原始的数据集
 df = pd.read_csv("./data/data2.csv", header=0)

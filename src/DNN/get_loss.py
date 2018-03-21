@@ -5,7 +5,9 @@ from sklearn import preprocessing
 from keras.models import Sequential
 from keras.layers import Dense
 
-
+"""
+跟train_840_pro-error一样
+"""
 
 # 读取原始的数据集
 df = pd.read_csv("./data2/sample.csv", header=0)

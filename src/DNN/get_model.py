@@ -7,7 +7,11 @@ from keras.layers import Dense
 from xlwt import Workbook
 from pandas import DataFrame
 
-
+"""
+获取不同比例的模型，
+输入参数：比例
+输出参数：模型
+"""
 def get_model(pro):
     data = pd.read_excel('../../data/DNN_train/model.xls')
 

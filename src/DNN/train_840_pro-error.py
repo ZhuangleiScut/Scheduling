@@ -6,7 +6,9 @@ from keras.models import Sequential
 from keras.layers import Dense
 from pandas import DataFrame
 
-
+"""
+求比例从0.1-0.5对应的误差，并画出图像
+"""
 def train_model():
     # 读取原始的数据集
     df = pd.read_excel("../../data/data840.xls", header=0)
@@ -91,12 +93,12 @@ if __name__ == '__main__':
     propro, los = train_model()
     print(len(propro),len(los))
     # 记录实验数据
-    data = pd.read_excel('../../data2/train_result.xlsx')
+    data = pd.read_excel('../../data/DNN_train/pro-error.xlsx')
     for i in range(50):
         data['train_set'][i] = propro[i]
         data['loss_with_usedtime'][i] = los[i]
 
-    DataFrame(data).to_excel('../../data2/train_result.xlsx')
+    DataFrame(data).to_excel('../../data/DNN_train/pro-error.xlsx')
 
 
     # summarize history for accuracy
@@ -105,4 +107,5 @@ if __name__ == '__main__':
     plt.ylabel('loss')
     plt.xlabel('train_set')
     plt.legend(['loss'], loc='upper right')
+    plt.savefig('../../data/DNN_train/pro-error.png')
     plt.show()

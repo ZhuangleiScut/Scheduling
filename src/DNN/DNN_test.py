@@ -5,6 +5,10 @@ from sklearn import preprocessing
 from keras.models import Sequential
 from keras.layers import Dense
 
+
+"""
+测试DNN的使用
+"""
 # 读取原始的数据集
 df = pd.read_csv("../../data/DNN_train/sample.csv", header=0)
 # 把数据转为float类型
