@@ -58,7 +58,7 @@ def get_model(pro):
 
     los = 0
     # 分离数据集，将数据集按比例分为训练集和测试集
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, train_size= 0.5,test_size=0.5)
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, train_size=0.5, test_size=0.5)
 
     # Scale the data for 收敛优化
     scaler = preprocessing.StandardScaler()
@@ -114,15 +114,19 @@ def get_model(pro):
     los = sum(erro) / len(erro)
 
 
+    temp = 0
+    while os.path.exists(path + str(pro) + '/model' + str(temp) + '.h5'):
+        temp += 1
+
     pos = int(pro / 0.1)
     print('pos', pos)
-    data['pro'][pos] = pro
-    data['error'][pos] = los
+    data['pro'][temp] = pro
+    data['error'][temp] = los
     DataFrame(data).to_excel(path + str(pro) + '/models_error.xls')
     print(sum(erro) / len(erro))
 
     # 保存模型
-    model.save(path + str(pro) + '/model.h5')
+    model.save(path + str(pro) + '/model' + str(temp) + '.h5')
 
 
 """
