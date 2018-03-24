@@ -23,12 +23,27 @@ import random
 """
 创建file存储结果
 """
+
+
 def mkfile(path):
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
     sheet1.write(0, 0, "id")
     sheet1.write(0, 1, "pro")
     sheet1.write(0, 2, "error")
+    sheet1.write(0, 3, "DNN_1")
+    sheet1.write(0, 4, "DNN_2")
+    sheet1.write(0, 5, "DNN_3")
+    sheet1.write(0, 6, "DNN_4")
+    sheet1.write(0, 7, "DNN_5")
+    sheet1.write(0, 8, "DNN_6")
+    sheet1.write(0, 9, "DNN_7")
+    sheet1.write(0, 10, "DNN_8")
+    sheet1.write(0, 11, "DNN_9")
+    sheet1.write(0, 12, "DNN_10")
+
+
+
     # sheet1.write(0, 3, "struct")
     for i in range(100):  # 暂定每个比例测100
         sheet1.write(i + 1, 0, i)
@@ -39,6 +54,8 @@ def mkfile(path):
 """
 获取model
 """
+
+
 def get_model(pro):
     # 创建文件夹
     path = '../../data/DNN_train/'
@@ -71,15 +88,34 @@ def get_model(pro):
     # Build a 2 layer fully connected DNN with 10 and 5 units respectively
     # 初始化
     model = Sequential()
+
+    # 随机构造神经网络模型,隐藏层数
+    ran_lay = random.randint(2, 10)
+    DNN_struct = []
+
     # 添加层，参数：隐藏层的节点数，第一层的输入维数，激活函数的类型
-    model.add(Dense(13, activation="relu", kernel_initializer="normal", input_dim=8))
-    model.add(Dense(13, activation="relu", kernel_initializer="normal"))
-    # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
-    # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
-    model.add(Dense(13, activation="relu", kernel_initializer="normal"))
-    # model.add(Dense(6, activation="relu", kernel_initializer="normal"))
+    for lay in range(ran_lay):  # 对于每一层
+        if lay == 0:
+            r = random.randint(5, 15)
+            DNN_struct.append(r)
+            model.add(Dense(r, activation="relu", kernel_initializer="normal", input_dim=8))
+        else:
+            r = random.randint(5, 15)
+            DNN_struct.append(r)
+            model.add(Dense(r, activation="relu", kernel_initializer="normal"))
+
+    # # 添加层，参数：隐藏层的节点数，第一层的输入维数，激活函数的类型
+    # model.add(Dense(13, activation="relu", kernel_initializer="normal", input_dim=8))
+    # model.add(Dense(13, activation="relu", kernel_initializer="normal"))
+    # # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
+    # # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
+    # model.add(Dense(13, activation="relu", kernel_initializer="normal"))
+    # # model.add(Dense(6, activation="relu", kernel_initializer="normal"))
+
+    # 最后一层
     model.add(Dense(1, kernel_initializer="normal"))
 
+    print("神经网络结构：", DNN_struct)
     # Compile the model, whith the mean squared error as a loss function
     # 编译模型，定义损失函数，均方差回归问题
     model.compile(loss='mse', optimizer='adam')
@@ -114,7 +150,6 @@ def get_model(pro):
     # print('归一化误差：', sum(erro_deal)/len(erro_deal))
     los = sum(erro) / len(erro)
 
-
     temp = 0
     while os.path.exists(path + str(pro) + '/model' + str(temp) + '.h5'):
         temp += 1
@@ -123,6 +158,8 @@ def get_model(pro):
     print('pos', pos)
     data['pro'][temp] = pro
     data['error'][temp] = los
+    for length in range(len(DNN_struct)):
+        data['DNN_'+str(length+1)][temp] = DNN_struct[length]
     DataFrame(data).to_excel(path + str(pro) + '/models_error.xls')
     print(sum(erro) / len(erro))
 
@@ -164,9 +201,13 @@ def get_task(pro):  # pro表示比例的十倍
             i += 1
     # print(ran)
     return ran
+
+
 """
 获取数据集矩阵
 """
+
+
 def get_data_matrix(pro, ran):
     path = '../../data/DNN_train/'
     # 构造结果表
@@ -184,14 +225,14 @@ def get_data_matrix(pro, ran):
     sheet1.write(0, 9, "disk_capacity")
     sheet1.write(0, 10, "frame_process_time")
 
-    for t in range(pro*84):
-        sheet1.write(t+1, 0, t)
+    for t in range(pro * 84):
+        sheet1.write(t + 1, 0, t)
     # 保存Excel book.save('path/文件名称.xls')
-    book.save(path+str(pro)+'/data_matrix.xls')
+    book.save(path + str(pro) + '/data_matrix.xls')
 
     dt = pd.read_excel("../../data/data840.xls")
     df = pd.read_excel(path + str(pro) + '/data_matrix.xls')
-    for i in range(pro*84):
+    for i in range(pro * 84):
         # print(ran)
         df['id'][i] = ran[i]
         df['image_size'][i] = dt['image_size'][ran[i]]
@@ -204,16 +245,25 @@ def get_data_matrix(pro, ran):
         df['mem_used'][i] = dt['mem_used'][ran[i]]
         df['disk_capacity'][i] = dt['disk_capacity'][ran[i]]
         df['frame_process_time'][i] = dt['frame_process_time'][ran[i]]
-
-        DataFrame(df).to_excel(path+str(pro)+'/data_matrix.xls')
         print('生成数据集矩阵:', i)
+    DataFrame(df).to_excel(path + str(pro) + '/data_matrix.xls')
+
 
 
 if __name__ == '__main__':
     # pro = 4  # 表示比例，用1表示0.1
+    # pro = 0.1 0.5 0.9
 
+    # for it in range(3):
+    #     if (it == 0):
+    #         pro = 1
+    #     elif it == 1:
+    #         pro = 5
+    #     else:
+    #         pro = 9
     for pro in range(1, 10):
-        for times in range(10):
+
+        for times in range(50):
             # 创建文件夹
             path = '../../data/DNN_train/'
             mkdir(path + str(pro))
@@ -233,12 +283,3 @@ if __name__ == '__main__':
                 get_data_matrix(pro, ran)
 
             get_model(pro)
-
-
-
-
-
-    # 画图像，从model_erro表中获取数据画图
-    # error = pd.read_excel(path+str(pro)+'/models_error.xls')
-
-
