@@ -4,7 +4,11 @@ from xlwt import Workbook
 # import numpy as np
 import random
 import matplotlib.pyplot as plt
+import os
 
+"""
+DNN调度
+"""
 
 ############################################################################
 # 在堆中做结构调整使得父节点的值大于子节点
@@ -40,43 +44,18 @@ def heapsort(heap):  # 将根节点取出与最后一位做对调，对前面len
 ############################################################################################
 
 
-def get_task_id(num, task_num):
-    data = pd.read_excel('../../data/loop/task_img_id'+str(num)+'.xls')
+def get_task_id(group_num, task_num):
+    data = pd.read_excel('../../data/loop/group'+str(group_num)+'/task_img_id_'+str(group_num)+'.xls')
     task_list = []
     for task in range(task_num):
-        temp = data['image_id'][task]
+        temp = data['data_id'][task]
         task_list.append(temp)
     return task_list
 
 
-# 获取真实运行时间矩阵，以便后续求deadline
-def get_time_matrix(num, pro, task_list, task_num):
-    # 构造结果表
-    book = Workbook(encoding='utf-8')
-    sheet1 = book.add_sheet('Sheet 1')
-    # sheet1.write(0, 0, "id")
-    for i in range(task_num):
-        sheet1.write(i + 1, 0, 'task' + str(task_list[i]))
-    for t in range(28):
-        sheet1.write(0, t + 1, 'equip' + str(t + 1))
-    sheet1.write(0, 29, 'deadline')
-    # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.'+str(pro+1)+'/predict_time_matrix0.'+str(pro+1)+'.xls')
-
-    for i in range(28):
-        # 打开原始数据文件
-        # 打开Excel文件
-        dt = pd.read_excel('../../data/loop/DNN/predict/0.'+str(pro+1)+'/result' + str(i + 1) + '.xlsx')
-        df = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/predict_time_matrix0.'+str(pro+1)+'.xls')
-        for t in range(task_num):
-            # 这里求deadline需要用tet真实值
-            df['equip' + str(i + 1)][t] = dt['predict_time'][task_list[t]]
-            DataFrame(df).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/predict_time_matrix0.'+str(pro+1)+'.xls')
-        print(i)
-
-
 # 根据任务列表进行调度，尽量跟原始数据表进行关联以减少数据耦合
-def get_load(pro, task_list, task_num):  # pro指的是比例
+def get_load(group_num, pro, task_list, task_num):  # pro指的是比例
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     # 构造结果表
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
@@ -89,13 +68,13 @@ def get_load(pro, task_list, task_num):  # pro指的是比例
     sheet1.write(31, 0, 30)
     sheet1.write(32, 0, 31)
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.'+str(pro+1)+'/load.xls')
+    book.save(path+'/load.xls')
 
     for i in range(equip_num):
         # 打开Excel文件
-        data = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx', sheetname=0)
-        load_record = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/load.xls')
-        time_record = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/predict_time_matrix0.' + str(pro + 1) + '.xls')
+        data = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx')
+        load_record = pd.read_excel(path+'/load.xls')
+        time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
         # data_size = len(data['frame_process_time'])
         # print(data_size)
         for img in range(task_num):
@@ -103,17 +82,18 @@ def get_load(pro, task_list, task_num):  # pro指的是比例
             mem = data['mem_used'][task_list[img]]
             # tet = data['predict_time'][task_list[img]]
             # 使用预测的矩阵中的时间值
-            tet = time_record['equip' + str(i + 1)][img]
+            tet = time_record['equip' + str(i)][img]
             # print(cpu,mem,tet)
             load = ((0.5 * cpu / 4) + (0.5 * mem / 8349896704)) * abs(tet)
             print('load', int(task_list[img]), load, cpu, mem, tet)
             load_record['task' + str(int(task_list[img]))][i] = load
             # 将更新写到新的Excel中
-            DataFrame(load_record).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/load.xls')
+            DataFrame(load_record).to_excel(path+'/load.xls')
 
 
 # 获取真实运行时间矩阵，以便后续求deadline
-def get_time_matrix(pro, task_list, task_num):
+def get_time_matrix(group_num, pro, task_list, task_num):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     # 构造结果表
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
@@ -124,23 +104,24 @@ def get_time_matrix(pro, task_list, task_num):
         sheet1.write(0, t + 1, 'equip' + str(t + 1))
     sheet1.write(0, 29, 'deadline')
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.'+str(pro+1)+'/time_matrix.xls')
+    book.save(path+'/time_matrix.xls')
 
     for i in range(equip_num):
         # 打开原始数据文件
         # 打开Excel文件
         dt = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx')
-        df = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/time_matrix.xls')
+        df = pd.read_excel(path+'/time_matrix.xls')
         for t in range(task_num):
             # 这里求deadline需要用tet真实值
             df['equip' + str(i + 1)][t] = dt['frame_process_time'][task_list[t]]
-            DataFrame(df).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/time_matrix.xls')
+            DataFrame(df).to_excel(path+'/time_matrix.xls')
         print(i)
 
 
-def get_deadline(pro, task_list, task_num, proportion):
+def get_deadline(group_num, pro, task_list, task_num, proportion):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     # 打开Excel文件
-    data = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/time_matrix.xls')
+    data = pd.read_excel(path+'/time_matrix.xls')
     for temp in range(task_num):
         heap = []
         # print(temps)
@@ -157,13 +138,14 @@ def get_deadline(pro, task_list, task_num, proportion):
         print('deadline', heap[proportion])
         data['deadline'][temp] = heap[proportion]
         # 将更新写到新的Excel中
-        DataFrame(data).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/deadline.xls')
+        DataFrame(data).to_excel(path+'/deadline.xls')
     temp += 1
 
 
-def get_minload(pro, task_list, task_num):
-    data = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/load.xls')
-    deadline = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/deadline.xls')
+def get_minload(group_num, pro, task_list, task_num):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
+    data = pd.read_excel(path+'/load.xls')
+    deadline = pd.read_excel(path+'/deadline.xls')
 
     index = []
 
@@ -185,12 +167,13 @@ def get_minload(pro, task_list, task_num):
         data['task' + str(int(task_list[i]))][29] = deadline['deadline'][i]
 
         # 将更新写到新的Excel中
-        DataFrame(data).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/min_load.xls')
+        DataFrame(data).to_excel(path+'/min_load.xls')
         print(min(data['task' + str(int(task_list[i]))]))
         print(index)
 
 
-def get_weight(pro, task_list, task_num):
+def get_weight(group_num, pro, task_list, task_num):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     # 构造结果表
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
@@ -210,10 +193,10 @@ def get_weight(pro, task_list, task_num):
         sheet1.write(i + 1, 0, i)
 
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.'+str(pro+1)+'/weight.xls')
+    book.save(path+'/weight.xls')
 
-    data = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/min_load.xls')
-    weight = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight.xls')
+    data = pd.read_excel(path+'/min_load.xls')
+    weight = pd.read_excel(path+'/weight.xls')
     # 求300个任务的最小的负载
     for i in range(task_num):
         deadline = data['task' + str(int(task_list[i]))][29]
@@ -226,11 +209,12 @@ def get_weight(pro, task_list, task_num):
         # print('rrrrrr',data['task' + str(i)][30])
 
         # 将更新写到新的Excel中
-        DataFrame(weight).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight.xls')
+        DataFrame(weight).to_excel(path+'/weight.xls')
         print(i)
 
 
-def get_weight_sorted(pro, task_list, task_num):
+def get_weight_sorted(group_num, pro, task_list, task_num):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     # 构造结果表
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
@@ -250,30 +234,34 @@ def get_weight_sorted(pro, task_list, task_num):
         sheet1.write(i + 1, 0, i)
 
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.'+str(pro+1)+'/weight_sorted.xls')
+    book.save(path+'/weight_sorted.xls')
 
     weight = []
     # 根据权重对任务进行排序
-    data = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight.xls')
-    dt = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight_sorted.xls')
+    data = pd.read_excel(path+'/weight.xls')
+    dt = pd.read_excel(path+'/weight_sorted.xls')
 
     for i in range(task_num):
         w = data['weight'][i]
         weight.append(w)
-    print(weight)
+
+    # print(weight)
     weight.sort()
-    print(weight)
+    # print(weight)
     weight.reverse()
-    print(weight)
-    # ind = weight.index(7.1535205620271753)
-    # print(ind)
+    # print(weight)
+
+    # print(' - weight', weight)
+    # random.shuffle(weight)
+    # print(' - weight_shuffle', weight)
+
     for temp in range(task_num):
         t = data['weight'][temp]
         ind = weight.index(t)
         # print(ind)
         data['sort'][temp] = ind
         # 将更新写到新的Excel中
-        DataFrame(data).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight.xls')
+        DataFrame(data).to_excel(path+'/weight.xls')
         print(temp)
     for n in range(task_num):
         sort = data['sort'][n]
@@ -285,7 +273,7 @@ def get_weight_sorted(pro, task_list, task_num):
         dt['weight'][sort] = data['weight'][n]
         dt['min_load_id'][sort] = data['min_load_id'][n]
         dt['sort'][sort] = data['sort'][n]
-    DataFrame(dt).to_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight_sorted.xls')
+    DataFrame(dt).to_excel(path+'/weight_sorted.xls')
 
 
 ##############################################################################################################
@@ -309,18 +297,20 @@ def get_min_load(result):
     return result[index]
 
 
-def get_task_position(task, task_num):
-    data = pd.read_excel('../../data/loop/task_img_id.xls')
+def get_task_position(group_num, task, task_num):
+    path = '../../data/loop/group' + str(group_num)
+    data = pd.read_excel(path+'/task_img_id_'+str(group_num)+'.xls')
     for i in range(task_num):
-        if data['image_id'][i] == task:
+        if data['data_id'][i] == task:
             return i
 
 
 # 每一次调度
-def get_scheduling(pro, vm):
+def get_scheduling(group_num, pro, vm):
+    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN'
     resourse = [vm * cpu, vm * mem]
     # 打开文件
-    data = pd.read_excel('../../data/loop/DNN/0.'+str(pro+1)+'/weight_sorted.xls')
+    data = pd.read_excel(path+'/weight_sorted.xls')
     success = 0
     scheduled = 0
     fail = 0
@@ -332,9 +322,11 @@ def get_scheduling(pro, vm):
         result = []
         # weight = data['sort'][k]
         task = data['task'][k]
-        tet_pos = get_task_position(task, task_num)
+        tet_pos = get_task_position(group_num, task, task_num)
         deadline = data['deadline'][k]
-        print('任务：', k, task, deadline)
+        print(' - DNN-' + 'group:'+str(group_num)+'-pro:'+str(pro))
+        print(' - vm:' + str(vm))
+        print(' - 任务：', k, task, deadline)
 
         # 根据task从初始数据中查TET是否符合deadline要求
         for t in range(28):
@@ -344,9 +336,8 @@ def get_scheduling(pro, vm):
             # if tet <= deadline:
             #     result.append(t)
             #     print('t', t, tet)
-            time_record = pd.read_excel(
-                '../../data/loop/DNN/0.' + str(pro + 1) + '/predict_time_matrix0.' + str(pro + 1) + '.xls')
-            tet = time_record['equip' + str(t + 1)][tet_pos]
+            time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
+            tet = time_record['equip' + str(t)][tet_pos]
             print('tet', tet)
             if abs(tet) <= deadline:
                 result.append(t)
@@ -365,13 +356,15 @@ def get_scheduling(pro, vm):
             times.append(deadline)
 
             # 将更新写到新的Excel中
-            DataFrame(data).to_excel('../../data/loop/DNN/0.' + str(pro + 1) + '/schedule/' + str(vm) + '.xlsx')
+            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '.xlsx')
 
             continue
 
         # 根据result求负载最小的配置对应的表（要加一），index为配置序号，包括0
         index = get_min_load(result)
-        print('符合要求的最小的序号：', index)
+        print(' - 符合要求的最小的序号：', index)
+
+        # index = random.randint(0, len(result)-1)
 
         print('resourse:', resourse[0], resourse[1])
         print('need', equips[index][0], equips[index][1])
@@ -421,19 +414,19 @@ def get_scheduling(pro, vm):
         # 没有调度
         else:
             fail += 1
-            times.append(deadline)
+            times.append(1.5*deadline)
             # 没有调度
             data['offload'][k] = 0
             # given资源记录
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
             # 将更新写到新的Excel中
-            DataFrame(data).to_excel('../../data/loop/DNN/0.' + str(pro + 1) + '/schedule/' + str(vm) + '.xlsx')
+            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '_DNN.xlsx')
             continue
 
         print('')
         # 将更新写到新的Excel中
-        DataFrame(data).to_excel('../../data/loop/DNN/0.' + str(pro + 1) + '/schedule/' + str(vm) + '.xlsx')
+        DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '_DNN.xlsx')
 
     times_avg = 0
     if len(times) > 0:
@@ -449,10 +442,16 @@ def get_scheduling(pro, vm):
     return success, times_avg, energys_avg, scheduled
 
 
+def mkdir(path):
+    folder = os.path.exists(path)
+    if not folder:
+        os.makedirs(path)
+        print('---new folder:', path)
+
 # 配置个数
 equip_num = 28
 # 参数配置
-vm = 10
+# vm = 10
 cpu = 4
 mem = 8
 task_num = 30
@@ -466,27 +465,31 @@ equips = [[1, 1], [2, 1], [3, 1], [4, 1], [2, 1], [4, 1], [4, 1],
 # task_num
 # task_list
 # data/predict中的预测时间
-def schedule_DNN(num, pro):                                 # num是第几组实验，pro是某一组实验的第几个比例
+def schedule_DNN(group_num, task_num, pro):                                 # num是第几组实验，pro是某一组实验的第几个比例
+    # 根路径
+    path = '../../data/loop/group'+str(group_num)+'/0.'+str(pro+1)+'/DNN'
+    if not os.path.exists(path):
+        mkdir(path)
+    if not os.path.exists(path+'/schedule'):
+        mkdir(path+'/schedule')
     # 任务个数
-    task_num = 30
     # 获取任务列表
-    task_list = get_task_id(num, task_num)
+    task_list = get_task_id(group_num, task_num)
     print('task_num:', task_list)
 
-    get_time_matrix(num, pro, task_list, task_num)
     ##################################################
     proportion = int(30 * 0.6)
     # 根据任务列表求负载
-    get_load(num, pro, task_list, task_num)
-    get_time_matrix(num, pro, task_list, task_num)
+    get_load(group_num, pro, task_list, task_num)
+    get_time_matrix(group_num, pro, task_list, task_num)
     # 从time_matrix中获取deadline,按照比例
-    get_deadline(num, pro, task_list, task_num, proportion)
-    get_minload(num, pro, task_list, task_num)
-    get_weight(num, pro, task_list, task_num)
-    get_weight_sorted(num, pro, task_list, task_num)
+    get_deadline(group_num, pro, task_list, task_num, proportion)
+    get_minload(group_num, pro, task_list, task_num)
+    get_weight(group_num, pro, task_list, task_num)
+    get_weight_sorted(group_num, pro, task_list, task_num)
     ##################################################
     # 虚拟机个数
-    vm = 10
+    # vm = 10
     successes = []
     schedule_pro = []
     times = []
@@ -504,11 +507,12 @@ def schedule_DNN(num, pro):                                 # num是第几组实
     for i in range(15):
         sheet1.write(i + 1, 0, i)
     # 保存Excel book.save('path/文件名称.xls')
-    book.save('../../data/loop/DNN/0.' + str(pro + 1) + '/scheduling_DNN.xls')
+    book.save(path + '/scheduling_DNN.xls')
 
-    data = pd.read_excel('../../data/loop/DNN/0.' + str(pro + 1) + '/scheduling_DNN.xls')
+    data = pd.read_excel(path + '/scheduling_DNN.xls')
     for vm in range(1, 11):
-        success, time, energy, scheduled = get_scheduling(pro, vm)
+        success, time, energy, scheduled = get_scheduling(group_num, pro, vm)
+
         successes.append(success)
         times.append(time)
         energys.append(energy)
@@ -521,44 +525,44 @@ def schedule_DNN(num, pro):                                 # num是第几组实
     print('time', times)
     print('energy', energys)
     print('schedule_pro', schedule_pro)
-    DataFrame(data).to_excel('../../data/loop/DNN/0.' + str(pro + 1) + '/scheduling_DNN.xls')
+    DataFrame(data).to_excel(path + '/scheduling_DNN.xls')
     # success.append(get_scheduling(vm))
 
     # summarize history for accuracy
     plt.plot(v, successes)
     # plt.plot(history.history['val_loss'])
-    plt.title('num_schedule')
+    plt.title('DNN_num_schedule')
     plt.ylabel('num_schedule')
     plt.xlabel('num_vm')
     plt.legend(['num'], loc='upper left')
-    plt.savefig('../../data/loop/DNN/0.' + str(pro + 1) + '/success.png')
+    plt.savefig(path + '/DNN_success.png')
     plt.show()
 
     # # summarize history for accuracy
     plt.plot(v, times)
     # plt.plot(history.history['val_loss'])
-    plt.title('time')
+    plt.title('DNN_time')
     plt.ylabel('time_schedule')
     plt.xlabel('num_vm')
     plt.legend(['time'], loc='upper left')
-    plt.savefig('../../data/loop/DNN/0.' + str(pro + 1) + '/time.png')
+    plt.savefig(path + '/DNN_time.png')
     plt.show()
 
     # # summarize history for accuracy
     plt.plot(v, energys)
     # plt.plot(history.history['val_loss'])
-    plt.title('energys')
+    plt.title('DNN_energys')
     plt.ylabel('energys')
     plt.xlabel('num_vm')
     plt.legend(['energys'], loc='upper left')
-    plt.savefig('../../data/loop/DNN/0.' + str(pro + 1) + '/energys.png')
+    plt.savefig(path + '/DNN_energys.png')
     plt.show()
 
     plt.plot(v, schedule_pro)
     # plt.plot(history.history['val_loss'])
-    plt.title('schedule_pro')
+    plt.title('DNN_schedule_pro')
     plt.ylabel('schedule_pro')
     plt.xlabel('num_vm')
     plt.legend(['schedule_pro'], loc='upper left')
-    plt.savefig('../../data/loop/DNN/0.' + str(pro + 1) + '/schedule_pro.png')
+    plt.savefig(path + '/DNN_schedule_pro.png')
     plt.show()
