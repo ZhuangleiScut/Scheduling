@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     delay = []
     offload = []
-    pro = 0.5
+    pro = 0.1
     # 个数
     group = 10
 
