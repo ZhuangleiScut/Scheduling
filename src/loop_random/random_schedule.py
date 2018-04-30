@@ -268,7 +268,7 @@ if __name__ == '__main__':
     task_num = 30  # 任务数（自定义）
     task_total = 300  # 任务总数
     # 一共有k组实验
-    for group_num in range(schedule_times):
+    for group_num in [2]:
         print('------第' + str(group_num) + '组实验------')
         # 每组实验的任务列表
         task_list = []
@@ -291,20 +291,20 @@ if __name__ == '__main__':
         print('------real调度:' + str(group_num) + '组实验------')
         random_schedule_real(group_num, task_num)
 
-        # 9个比例循环实现
-        for i in [0, 4, 8]:
-            # 新建比例的文件夹
-            if not os.path.exists(path + 'group' + str(group_num) + '/0.' + str(i + 1)):
-                mkdir(path + 'group' + str(group_num) + '/0.' + str(i + 1))
-
-            # 根据不同比例预测数据
-            print('------获取DNN预测时间矩阵:' + str(group_num) + '组' + str(i) + '比例实验------')
-            get_predict_time_matrix(group_num, i)  # 输入组别，比例，任务列表
-
-            print('------DNN调度:' + str(group_num) + '组' + str(i) + '比例实验------')
-            random_schedule_DNN(group_num, task_num, i)
-
-            print('------matrix调度:' + str(group_num) + '组' + str(i) + '比例实验------')
-            random_schedule_matrix(group_num, task_num, i)
+        # # 9个比例循环实现
+        # for i in [0, 4, 8]:
+        #     # 新建比例的文件夹
+        #     if not os.path.exists(path + 'group' + str(group_num) + '/0.' + str(i + 1)):
+        #         mkdir(path + 'group' + str(group_num) + '/0.' + str(i + 1))
+        #
+        #     # 根据不同比例预测数据
+        #     print('------获取DNN预测时间矩阵:' + str(group_num) + '组' + str(i) + '比例实验------')
+        #     get_predict_time_matrix(group_num, i)  # 输入组别，比例，任务列表
+        #
+        #     print('------DNN调度:' + str(group_num) + '组' + str(i) + '比例实验------')
+        #     random_schedule_DNN(group_num, task_num, i)
+        #
+        #     print('------matrix调度:' + str(group_num) + '组' + str(i) + '比例实验------')
+        #     random_schedule_matrix(group_num, task_num, i)
 
         print('')

@@ -279,7 +279,7 @@ if __name__ == '__main__':
     task_num = 30  # 任务数（自定义）
     task_total = 300  # 任务总数
     # 一共有k组实验
-    for group_num in range(schedule_times):
+    for group_num in [9]:
         print('------第' + str(group_num) + '组实验------')
         # 每组实验的任务列表
         task_list = []
@@ -299,11 +299,11 @@ if __name__ == '__main__':
         # 获取真实时间矩阵,为了matrix的预测准备数据
         get_real_time_matrix(group_num)
 
-        print('------real调度:' + str(group_num) + '组实验------')
-        schedule_real(group_num, task_num)
+        # print('------real调度:' + str(group_num) + '组实验------')
+        # schedule_real(group_num, task_num)
 
         # 9个比例循环实现0,4,8
-        for i in [4]:
+        for i in [0, 8]:
             # 新建比例的文件夹
             if not os.path.exists(path + 'group' + str(group_num) + '/0.' + str(i + 1)):
                 mkdir(path + 'group' + str(group_num) + '/0.' + str(i + 1))

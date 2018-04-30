@@ -416,12 +416,12 @@ def get_scheduling(group_num, pro, vm):
             data['cpu_given'][k] = 0
             data['mem_given'][k] = 0
             # 将更新写到新的Excel中
-            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '.xlsx')
+            DataFrame(data).to_excel(path + '/schedule/DNN_' + str(vm) + '.xlsx')
             continue
 
         print('')
         # 将更新写到新的Excel中
-        DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '.xlsx')
+        DataFrame(data).to_excel(path + '/schedule/DNN_' + str(vm) + '.xlsx')
 
     times_avg = 0
     if len(times) > 0:

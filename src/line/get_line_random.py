@@ -14,16 +14,19 @@ if __name__ == '__main__':
     delay = []
     offload = []
     pro = 0.5
+    # 个数
+    group = 10
 
     # 读取表,10组
-    for i in range(2):
+    for i in range(group):
         real_i = pd.read_excel(path + "loop/group" + str(i) + "/real/scheduling_real.xls")
         DNN_i = pd.read_excel(path + "loop/group" + str(i) + '/' + str(pro) + "/DNN/scheduling_DNN.xls")
         martix_i = pd.read_excel(path + "loop/group" + str(i) + '/' + str(pro) + "/matrix/scheduling_matrix.xls")
 
         real_random_i = pd.read_excel(path + "random_loop/group" + str(i) + "/real/scheduling_real.xls")
         DNN_random_i = pd.read_excel(path + "random_loop/group" + str(i) + '/' + str(pro) + "/DNN/scheduling_DNN.xls")
-        martix_random_i = pd.read_excel(path + "random_loop/group" + str(i) + '/' + str(pro) + "/matrix/scheduling_matrix.xls")
+        martix_random_i = pd.read_excel(path + "random_loop/group" + str(i) + '/' + str(pro) + "/matrix"
+                                                                                               "/scheduling_matrix.xls")
 
         DNN.append(DNN_i)
         matrix.append(martix_i)
@@ -60,7 +63,7 @@ if __name__ == '__main__':
         ndr = []
         tmr = []
         nmr = []
-        for t in range(2):
+        for t in range(group):
             # 算10组平均值
             r = real[t]
             d = DNN[t]
@@ -143,7 +146,7 @@ if __name__ == '__main__':
     plt.title('schedule_delay' + str(pro))
     plt.ylabel('delay')
     plt.xlabel('vm_num')
-    plt.legend(['real', 'DNN', 'matrix', 'random_real', 'random_DNN', 'random_matrix'], loc='upper left')
+    plt.legend(['real', 'DNN', 'matrix', 'random_real', 'random_DNN', 'random_matrix'], loc='lower left')
     plt.savefig(path + '/delay_' + str(pro) + '.png')
     plt.show()
 

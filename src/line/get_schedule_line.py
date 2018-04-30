@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     # 打开真实值调度表和预测值调度表
-    group = 0
+    # 序号
+    group = 4
     propro = 0.5
     path = '../../data/random_loop/'
     data1 = pd.read_excel(path + 'group' + str(group) + '/real/scheduling_real.xls')
