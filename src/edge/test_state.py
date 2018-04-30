@@ -41,11 +41,11 @@ def load_stat():
     f = open("/proc/loadavg")
     con = f.read().split()
     f.close()
-    loadavg['lavg_1']=con[0]
-    loadavg['lavg_5']=con[1]
-    loadavg['lavg_15']=con[2]
-    loadavg['nr']=con[3]
-    loadavg['last_pid']=con[4]
+    loadavg['lavg_1'] = con[0]
+    loadavg['lavg_5'] = con[1]
+    loadavg['lavg_15'] = con[2]
+    loadavg['nr'] = con[3]
+    loadavg['last_pid'] = con[4]
     return loadavg
 
 
@@ -56,8 +56,8 @@ def uptime_stat():
     con = f.read().split()
     f.close()
     all_sec = float(con[0])
-    MINUTE,HOUR,DAY = 60,3600,86400
-    uptime['day'] = int(all_sec / DAY )
+    MINUTE, HOUR, DAY = 60, 3600, 86400
+    uptime['day'] = int(all_sec / DAY)
     uptime['hour'] = int((all_sec % DAY) / HOUR)
     uptime['minute'] = int((all_sec % HOUR) / MINUTE)
     uptime['second'] = int(all_sec % MINUTE)
@@ -117,7 +117,7 @@ def net_stat():
 # get disk state
 def disk_stat():
     import os
-    hd={}
+    hd = {}
     disk = os.statvfs("/")
     hd['available'] = disk.f_bsize * disk.f_bavail
     hd['capacity'] = disk.f_bsize * disk.f_blocks
@@ -132,9 +132,9 @@ if __name__ == '__main__':
     uptime = uptime_stat()
     net_state = net_stat()
     disk_state = disk_stat()
-    print('memory:',memory)
-    print('cpu:',cpu)
-    print('load:',load)
-    print('uptime:',uptime)
-    print('net:',net_state)
-    print('disk:',disk_state)
+    print('memory:', memory)
+    print('cpu:', cpu)
+    print('load:', load)
+    print('uptime:', uptime)
+    print('net:', net_state)
+    print('disk:', disk_state)

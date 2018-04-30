@@ -57,5 +57,3 @@ for e in erro:
     erro_deal.append(erro_norm)
 print('归一化误差：', sum(erro_deal)/len(erro_deal))
 print(sum(erro_deal))
-
-

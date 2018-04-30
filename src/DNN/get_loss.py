@@ -10,13 +10,13 @@ from keras.layers import Dense
 """
 
 # 读取原始的数据集
-df = pd.read_csv("./data2/sample.csv", header=0)
+df = pd.read_csv("../../data/DNN_train/sample.csv", header=0)
 # 把数据转为float类型
 # df['displacement'] = df['displacement'].astype(float)
 
 # 逐列获取数据集
 # First and last (mpg and car names) are ignored for X,左闭右开，13个
-X = df[df.columns[0:13]]
+X = df[df.columns[0:8]]
 # print(df.columns[0:3])
 y = df['process_time']
 
@@ -40,7 +40,7 @@ for i in range(50):
     # 初始化
     model = Sequential()
     # 添加层，参数：隐藏层的节点数，第一层的输入维数，激活函数的类型
-    model.add(Dense(13, activation="relu", kernel_initializer="normal", input_dim=13))
+    model.add(Dense(13, activation="relu", kernel_initializer="normal", input_dim=8))
     model.add(Dense(13, activation="relu", kernel_initializer="normal"))
     # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
     # model.add(Dense(26, activation="relu", kernel_initializer="normal"))
