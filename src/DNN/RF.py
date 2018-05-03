@@ -143,6 +143,7 @@ def get_RF_predict(group, pro):
 if __name__ == "__main__":
     # 10组
     # 9种比例
+
     for g in [9]:
         for p in range(9):
             get_RF_predict(g, p)
