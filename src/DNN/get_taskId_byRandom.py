@@ -6,7 +6,7 @@ from xlwt import Workbook
 
 # 创建目标表
 def build_xlsx(num):
-    # 创建文件以存储840个样本
+    # 创建文件以存储480个样本
     book = Workbook(encoding='utf-8')
     sheet1 = book.add_sheet('Sheet 1')
     sheet1.write(0, 0, "id")
