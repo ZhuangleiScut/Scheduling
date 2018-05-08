@@ -9,6 +9,13 @@ from sklearn import preprocessing
 import pandas as pd
 from xlwt import Workbook
 
+"""
+    RF和BG训练及预测
+    input:
+        group:第几组
+        pro:比例
+"""
+
 
 def get_RF_predict(group, pro):
     path = './result/' + str(group) + '/'

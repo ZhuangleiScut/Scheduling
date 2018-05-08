@@ -4,6 +4,11 @@ from pandas import DataFrame
 from xlwt import Workbook
 import math
 
+"""
+    画图
+    按比例根据delay、offload_num、energy、pro的数据来画图
+    6个图：正常3个；随机3个
+"""
 if __name__ == '__main__':
     path = '../../data/'
     DNN = []
@@ -15,7 +20,7 @@ if __name__ == '__main__':
 
     delay = []
     offload = []
-    pro = 0.9
+    pro = 0.1
     # 个数
     group = 10
 

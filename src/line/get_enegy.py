@@ -4,6 +4,12 @@ from pandas import DataFrame
 from xlwt import Workbook
 import math
 
+
+"""
+    获取energy数据；
+    6个图：正常3个；随机3个
+    画图：将上述数据画图
+"""
 if __name__ == '__main__':
     path = '../../data/'
     DNN = []
