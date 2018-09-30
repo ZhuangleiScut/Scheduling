@@ -299,8 +299,8 @@ if __name__ == '__main__':
         # 获取真实时间矩阵,为了matrix的预测准备数据
         get_real_time_matrix(group_num)
 
-        # print('------real调度:' + str(group_num) + '组实验------')
-        # schedule_real(group_num, task_num)
+        print('------real调度:' + str(group_num) + '组实验------')
+        schedule_real(group_num, task_num)
 
         # 9个比例循环实现0,4,8
         for i in [0, 8]:
@@ -317,5 +317,4 @@ if __name__ == '__main__':
 
             print('------matrix调度:' + str(group_num) + '组' + str(i) + '比例实验------')
             schedule_matrix(group_num, task_num, i)
-
         print('')

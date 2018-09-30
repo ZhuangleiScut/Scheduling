@@ -3,8 +3,8 @@ loop实现循环多次实验
 ## 程序主入口
 schedule是程序的主入口。通过调用schedule_DNN.py、schedule_real.py、schedule_matrix.py来实现调度
 ## 程序输入输出说明
-- 1、需要输入matrix预测的矩阵
-- 2、DNN程序自动预测，不需要输入
+- 1、需要输入matrix预测的矩阵，数据放在/data/newMatrixGenerateTET/文件夹中，格式按照文件夹中数据的格式
+- 2、DNN程序通过加载训练好的模型自动预测，不需要输入
 - 3、输出为data/loop文件夹中的数据
 ## 代码说明
 - schedule_DNN：单次DNN调度

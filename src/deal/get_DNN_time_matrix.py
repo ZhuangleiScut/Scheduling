@@ -1,9 +1,6 @@
 import pandas as pd
 from pandas import DataFrame
 from xlwt import Workbook
-# import numpy as np
-import random
-import matplotlib.pyplot as plt
 
 
 def get_task_id(task_num):
