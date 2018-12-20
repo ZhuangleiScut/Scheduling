@@ -20,7 +20,6 @@ if not os.path.exists('0.xls'):
         book.save('0.xls')
         print('建表完成。')
 
-
     # 打开原始数据文件
     # 打开Excel文件
     dt = pd.read_excel('0.xls')

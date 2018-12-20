@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import time
 from pandas import DataFrame
 from xlwt import Workbook
 import matplotlib.pyplot as plt
@@ -501,4 +502,7 @@ def schedule_real(task_num):
 
 
 if __name__ == '__main__':
+    t1 = time.time()
     schedule_real(task_num)
+    t2 = time.time()
+    print(t2-t1)
