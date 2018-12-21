@@ -7,9 +7,9 @@ from keras.models import load_model
 from pandas import DataFrame
 from xlwt import Workbook
 
-from src.loop.schedule_DNN import schedule_DNN
-from src.loop.schedule_matrix import schedule_matrix
-from src.loop.schedule_real import schedule_real
+from src.loop_partition_VM.schedule_DNN import schedule_DNN
+from src.loop_partition_VM.schedule_matrix import schedule_matrix
+from src.loop_partition_VM.schedule_real import schedule_real
 
 """
 实现多组实验，多比例实验
@@ -229,7 +229,7 @@ def get_matrix(group_num, pro):
 
 def get_predict_time_matrix(group_num, pro):  # 输入组别，比例，任务列表
     # 预测时间
-    path = '../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1)
+    path = '../../data/loop_partiton_VM/group' + str(group_num) + '/0.' + str(pro + 1)
     if not os.path.exists(path + '/DNN_predict_data_0.' + str(pro + 1) + '.xls'):
         get_predict_time(group_num, pro)
         # 构造矩阵
@@ -242,7 +242,7 @@ def get_predict_time_matrix(group_num, pro):  # 输入组别，比例，任务�
 
 
 def get_real_time_matrix(group_num):
-    path = '../../data/loop/'
+    path = '../../data/loop_partiton_VM/'
     # 构造矩阵
     if not os.path.exists(
             path + 'group' + str(group_num) + '/real_time_matrix_' + str(group_num) + '.xls'):
@@ -274,12 +274,12 @@ def get_real_time_matrix(group_num):
 
 
 if __name__ == '__main__':
-    path = '../../data/loop/'
+    path = '../../data/loop_partiton_VM/'
     schedule_times = 10  # 实验组数（自定义）
     task_num = 30  # 任务数（自定义）
     task_total = 300  # 任务总数
     # 一共有k组实验
-    for group_num in [9]:
+    for group_num in range(10):
         print('------第' + str(group_num) + '组实验------')
         # 每组实验的任务列表
         task_list = []
