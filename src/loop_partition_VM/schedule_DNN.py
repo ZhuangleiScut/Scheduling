@@ -71,11 +71,12 @@ def get_load(group_num, pro, task_list, task_num):  # pro指的是比例
     # 保存Excel book.save('path/文件名称.xls')
     book.save(path+'/load.xls')
 
+
     for i in range(equip_num):
         # 打开Excel文件
         data = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx')
         load_record = pd.read_excel(path+'/load.xls')
-        time_record = pd.read_excel('../../data/loop_partiton_VM/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
+        time_record = pd.read_excel('../../data/loop_partiton_VM/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_predict_time_matrix_0.'+str(pro+1) + '.xls')
         # data_size = len(data['frame_process_time'])
         # print(data_size)
         for img in range(task_num):
@@ -340,7 +341,7 @@ def get_scheduling(group_num, pro, vm):
             # if tet <= deadline:
             #     result.append(t)
             #     print('t', t, tet)
-            time_record = pd.read_excel('../../data/loop_partiton_VM/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
+            time_record = pd.read_excel('../../data/loop_partiton_VM/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_predict_time_matrix_0.'+str(pro+1) + '.xls')
             tet = time_record['equip' + str(t)][tet_pos]
             print('tet', tet)
             if abs(tet) <= deadline:
@@ -360,7 +361,7 @@ def get_scheduling(group_num, pro, vm):
             times.append(deadline)
 
             # 将更新写到新的Excel中
-            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '.xlsx')
+            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '_DNN.xlsx')
 
             continue
 
@@ -378,12 +379,13 @@ def get_scheduling(group_num, pro, vm):
         # 求任务在index序号下的运行时间，看是否符合deadline
         # real_time = get_real_time(index)
 
+# 分配資源
 ########################################################################################################################
         # todo 先计算最适合的VM
         best_id = -1
         lest_res = 2    # 最大为2
 
-        for res in range(10):
+        for res in range(vm):
             if (resourse[res][0] >= equips[index][0]) and (resourse[res][1] >= equips[index][1]):
                 # todo 做差，存在数组id_vm,以便求最适vm
                 res_cpu = resourse[res][0] - equips[index][0]
@@ -430,6 +432,7 @@ def get_scheduling(group_num, pro, vm):
                 # given资源记录
                 data['cpu_given'][k] = equips[index][0]
                 data['mem_given'][k] = equips[index][1]
+
                 # 功率为硬件*时间
                 energy = (equips[index][0] / 4) * time
                 energys.append(energy)

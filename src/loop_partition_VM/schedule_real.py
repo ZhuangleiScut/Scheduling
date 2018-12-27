@@ -324,7 +324,7 @@ def get_scheduling(group_num, vm):
             times.append(deadline)
             print('mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm没有符合要求', times)
             # 将更新写到新的Excel中
-            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '.xlsx')
+            DataFrame(data).to_excel(path + '/schedule/' + str(vm) + '_real.xlsx')
             continue
 
         # 根据result求负载最小的配置对应的表（要加一）
@@ -343,7 +343,7 @@ def get_scheduling(group_num, vm):
         best_id = -1
         lest_res = 2    # 最大为2
 
-        for res in range(10):
+        for res in range(vm):
             if (resourse[res][0] >= equips[index][0]) and (resourse[res][1] >= equips[index][1]):
                 # todo 做差，存在数组id_vm,以便求最适vm
                 res_cpu = resourse[res][0] - equips[index][0]

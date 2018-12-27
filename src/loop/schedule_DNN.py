@@ -74,7 +74,7 @@ def get_load(group_num, pro, task_list, task_num):  # pro指的是比例
         # 打开Excel文件
         data = pd.read_excel('../../data/raw/result' + str(i + 1) + '.xlsx')
         load_record = pd.read_excel(path+'/load.xls')
-        time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
+        time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_predict_time_matrix_0.'+str(pro+1) + '.xls')
         # data_size = len(data['frame_process_time'])
         # print(data_size)
         for img in range(task_num):
@@ -336,7 +336,7 @@ def get_scheduling(group_num, pro, vm):
             # if tet <= deadline:
             #     result.append(t)
             #     print('t', t, tet)
-            time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_matrix_0.'+str(pro+1) + '.xls')
+            time_record = pd.read_excel('../../data/loop/group' + str(group_num) + '/0.' + str(pro + 1) + '/DNN_predict_time_matrix_0.'+str(pro+1) + '.xls')
             tet = time_record['equip' + str(t)][tet_pos]
             print('tet', tet)
             if abs(tet) <= deadline:

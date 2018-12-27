@@ -207,24 +207,24 @@ def get_matrix(group_num, pro):
             path + 'group' + str(group_num) + '/0.' + str(i + 1) + '/DNN_predict_data_0.' + str(pro + 1) + '.xls')
         df = pd.read_excel(path + 'group' + str(group_num) + '/0.' + str(i + 1) + '/DNN_predict_time_matrix_0.' + str(
             pro + 1) + '.xls')
-        # for table in range(840):
-        #     if table in real_data:
-        #         df['equip' + str(int(table / 30))][int(table % 30)] = dt['frame_process_time'][table]
-        #     else:
-        #         # print('equip' + str(table % 28), int(table / 28))
-        #         df['equip' + str(int(table / 30))][int(table % 30)] = dt['predict_time'][table]
-        #
-        #     DataFrame(df).to_excel(
-        #         path + 'group' + str(group_num) + '/0.' + str(i + 1) + '/DNN_predict_time_matrix_0.' + str(
-        #             pro + 1) + '.xls')
-        #     print('---get DNN matrix:', table)
         for table in range(840):
-            df['equip' + str(int(table / 30))][int(table % 30)] = dt['predict_time'][table]
+            if table in real_data:
+                df['equip' + str(int(table / 30))][int(table % 30)] = dt['frame_process_time'][table]
+            else:
+                # print('equip' + str(table % 28), int(table / 28))
+                df['equip' + str(int(table / 30))][int(table % 30)] = dt['predict_time'][table]
 
             DataFrame(df).to_excel(
                 path + 'group' + str(group_num) + '/0.' + str(i + 1) + '/DNN_predict_time_matrix_0.' + str(
                     pro + 1) + '.xls')
             print('---get DNN matrix:', table)
+        # for table in range(840):
+        #     df['equip' + str(int(table / 30))][int(table % 30)] = dt['predict_time'][table]
+        #
+        #     DataFrame(df).to_excel(
+        #         path + 'group' + str(group_num) + '/0.' + str(i + 1) + '/DNN_predict_time_matrix_0.' + str(
+        #             pro + 1) + '.xls')
+        #     print('---get DNN matrix:', table)
 
 
 def get_predict_time_matrix(group_num, pro):  # 输入组别，比例，任务列表
@@ -300,7 +300,7 @@ if __name__ == '__main__':
         get_real_time_matrix(group_num)
 
         print('------real调度:' + str(group_num) + '组实验------')
-        schedule_real(group_num, task_num)
+        # schedule_real(group_num, task_num)
 
         # 9个比例循环实现0,4,8
         for i in [0, 4, 8]:
