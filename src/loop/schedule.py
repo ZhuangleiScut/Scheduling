@@ -279,7 +279,7 @@ if __name__ == '__main__':
     task_num = 30  # 任务数（自定义）
     task_total = 300  # 任务总数
     # 一共有k组实验
-    for group_num in [9]:
+    for group_num in range(10):
         print('------第' + str(group_num) + '组实验------')
         # 每组实验的任务列表
         task_list = []

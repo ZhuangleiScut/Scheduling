@@ -7,9 +7,9 @@ from keras.models import load_model
 from pandas import DataFrame
 from xlwt import Workbook
 
-from src.loop_partition_VM.schedule_DNN import schedule_DNN
-from src.loop_partition_VM.schedule_matrix import schedule_matrix
-from src.loop_partition_VM.schedule_real import schedule_real
+from src.loop_vm_apart.schedule_DNN import schedule_DNN
+from src.loop_vm_apart.schedule_matrix import schedule_matrix
+from src.loop_vm_apart.schedule_real import schedule_real
 
 """
 实现多组实验，多比例实验
