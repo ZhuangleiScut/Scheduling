@@ -507,7 +507,7 @@ if __name__ == '__main__':
 
     vm_num = 10  # 虚拟机数量
     cpu_max = 4  # 虚拟机CPU
-    mem_max = 8  # 虚拟机内存
+    mem_max = 4  # 虚拟机内存
 
     # deadline的比例
     propor = 0.6
