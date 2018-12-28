@@ -34,6 +34,8 @@ def heapsort(heap):  # 将根节点取出与最后一位做对调，对前面len
     for i in range(len(heap) - 1, -1, -1):
         heap[0], heap[i] = heap[i], heap[0]
         max_heapify(heap, i, 0)
+
+
 ############################################################################################
 
 
@@ -255,7 +257,12 @@ def get_scheduling(vm, task_num, MEM, equips, cpu_max, mem_max, PORPRO, input_pa
     :param output_path: 输出路径
     :return:
     """
-    resourse = [vm * cpu_max, vm * mem_max]
+    # 构造虚拟机资源列表
+    resourse = []
+    for re in range(vm_num):
+        resourse.append([cpu_max, mem_max])
+    print(resourse)
+
     # 打开文件
     data = pd.read_excel(output_path + '/weight_sorted.xls')
     success = 0
@@ -304,11 +311,45 @@ def get_scheduling(vm, task_num, MEM, equips, cpu_max, mem_max, PORPRO, input_pa
         print('need', equips[index][0], equips[index][1])
         data['cpu_need'][k] = equips[index][0]
         data['mem_need'][k] = equips[index][1]
-        # 如果资源足够，可以进行调度。剩余资源减去调度资源
-        if (resourse[0] >= equips[index][0]) and (resourse[1] >= equips[index][1]):
 
-            resourse[0] = resourse[0] - equips[index][0]
-            resourse[1] = resourse[1] - equips[index][1]
+#####################################################################################################
+        # todo 先计算最适合的VM
+        best_id = -1
+        rest_res = 2  # 最大为2
+
+        for res in range(vm):
+            if (resourse[res][0] >= equips[index][0]) and (resourse[res][1] >= equips[index][1]):
+                # todo 做差，存在数组id_vm,以便求最适vm
+                res_cpu = resourse[res][0] - equips[index][0]
+                res_mem = resourse[res][1] - equips[index][1]
+
+                if rest_res > (res_cpu / float(cpu_max) + res_mem / float(mem_max)):
+                    rest_res = res_cpu / float(cpu_max) + res_mem / float(mem_max)
+                    best_id = res
+
+                    # 记录max
+                    if res_cpu/float(cpu_max) <= res_mem/float(mem_max):
+                        max_tuple = res_cpu/float(cpu_max)
+                    else:
+                        max_tuple = res_mem/float(mem_max)
+
+                    # todo
+                elif rest_res == (res_cpu / float(cpu_max) + res_mem / float(mem_max)):
+                    # 计算min，然后取max_min
+                    if res_cpu/float(cpu_max) <= res_mem/float(mem_max):
+                        min_tuple = res_cpu/float(cpu_max)
+                    else:
+                        min_tuple = res_mem/float(mem_max)
+
+                    if max_tuple < min_tuple:
+                        max_tuple = min_tuple
+                        best_id = res
+
+        # 如果资源足够，可以进行调度。剩余资源减去调度资源
+        if best_id != -1:
+            # 分配资源
+            resourse[best_id][0] = resourse[best_id][0] - equips[index][0]
+            resourse[best_id][1] = resourse[best_id][1] - equips[index][1]
 
             # task 和index,这里用的是真实值
             table = pd.read_excel(input_path + '/TET_real.xlsx')
@@ -336,6 +377,7 @@ def get_scheduling(vm, task_num, MEM, equips, cpu_max, mem_max, PORPRO, input_pa
             # 将更新写到新的Excel中
             DataFrame(data).to_excel(output_path + '/schedule/' + str(vm) + '_' + schedule_type + '.xlsx')
             continue
+################################################################################################################
 
         print('')
         # 将更新写到新的Excel中
@@ -378,6 +420,7 @@ def schedule(task_num, equips, cpu_max, mem_max, propor, MEM, PORPRO, vm_num, in
     :param schedule_type:调度模式，分real，DNN，matrix
     :return:无返回值，运行结果是输出路径中生成的文件
     """
+
     output_path = output_path + '/' + schedule_type
     if not os.path.exists(output_path):
         os.mkdir(output_path)
@@ -413,8 +456,9 @@ def schedule(task_num, equips, cpu_max, mem_max, propor, MEM, PORPRO, vm_num, in
     book.save(output_path + '/scheduling_' + schedule_type + '.xls')
 
     data = pd.read_excel(output_path + '/scheduling_' + schedule_type + '.xls')
-    for vm in range(1, vm_num+1):
-        success, _time, energy = get_scheduling(vm, task_num, MEM, equips, cpu_max, mem_max, PORPRO, input_path, output_path, schedule_type)
+    for vm in range(1, vm_num + 1):
+        success, _time, energy = get_scheduling(vm, task_num, MEM, equips, cpu_max, mem_max, PORPRO, input_path,
+                                                output_path, schedule_type)
         successes.append(success)
         times.append(_time)
         energys.append(energy)
@@ -479,6 +523,13 @@ if __name__ == '__main__':
     t1 = time.time()
     input_path = './input'
     output_path = './output'
+    # 判断是否存在输入输出目录
+    if (not os.path.exists('./input')) or len(os.listdir('./input')) == 0:
+        print('程序没有输入！')
+        os.mkdir('./input')
+        exit()
+    if not os.path.exists('./output'):
+        os.mkdir('./output')
     schedule(task_num, equips, cpu_max, mem_max, propor, MEM, 0.5, vm_num, input_path, output_path, 'real')
     t2 = time.time()
-    print(t2-t1)
+    print(t2 - t1)

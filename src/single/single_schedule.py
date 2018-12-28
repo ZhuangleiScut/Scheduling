@@ -364,15 +364,19 @@ def mkdir(path):
 
 def schedule(task_num, equips, cpu_max, mem_max, propor, MEM, PORPRO, vm_num, input_path, output_path, schedule_type):
     """
-    :param task_num:
-    :param equip_num:
-    :param propor:
-    :param MEM:
-    :param PORPRO:
-    :param vm_num:
-    :param input_path:
-    :param output_path:
-    :return:
+    调度程序入口
+    :param task_num: 任务数
+    :param equips: 配置列表
+    :param cpu_max: 虚拟机最大CPU数
+    :param mem_max: 虚拟机最大内存数
+    :param propor: deadline定义的比例
+    :param MEM:内存列表
+    :param PORPRO:CPU占比
+    :param vm_num:虚拟机资源数
+    :param input_path:输入路径
+    :param output_path:输出路径
+    :param schedule_type:调度模式，分real，DNN，matrix
+    :return:无返回值，运行结果是输出路径中生成的文件
     """
 
     output_path = output_path + '/' + schedule_type
@@ -473,6 +477,13 @@ if __name__ == '__main__':
     t1 = time.time()
     input_path = './input'
     output_path = './output'
+    # 判断是否存在输入输出目录
+    if (not os.path.exists('./input')) or len(os.listdir('./input')) == 0:
+        print('程序没有输入！')
+        os.mkdir('./input')
+        exit()
+    if not os.path.exists('./output'):
+        os.mkdir('./output')
     schedule(task_num, equips, cpu_max, mem_max, propor, MEM, 0.5, vm_num, input_path, output_path, 'real')
     t2 = time.time()
     print(t2-t1)
