@@ -426,6 +426,7 @@ def schedule(task_num, equips, cpu_max, mem_max, propor, MEM, PORPRO, vm_num, in
         os.mkdir(output_path)
     if not os.path.exists(output_path + '/schedule'):
         os.mkdir(output_path + '/schedule')
+        
     ##################################################
     proportion = int(len(equips) * propor)
     # 根据任务列表求负载
