@@ -1,4 +1,12 @@
-调度文档说明
+# TPDS论文《Learning Driven Computation Offloading for Asymmetrically Informed Edge Computing》
+# 论文连接
+https://ieeexplore.ieee.org/document/8618389
+
+# 论文概述
+ - 基于学习驱动的非对称边缘场景下的任务迁移算法
+ - 任务执行时间预测算法
+ - 学习驱动的任务迁移算法
+###调度文档说明
 一、	调度概述
 调度类型：基于real调度、基于DNN调度、基于matrix调度。
 
